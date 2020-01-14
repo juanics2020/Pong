@@ -6,9 +6,12 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -17,26 +20,29 @@ import javafx.util.Duration;
  */
 public class App extends Application {
     //declaramos todas las variables generales aquí
-    int ballCenterX = 0;//Si declarara la variable dentro no serviría poque la estaría declarando cada vez que entra en el bucle
-    int ballDirectionX = 1; //Si la dirección es a la derecha (suma) y si es a la izquierda (resta)
-    int ballCurrentSpeedX = 6;//El incremento que irá tomando. Velocidad
+    short ballCenterX = 0;//Si declarara la variable dentro no serviría poque la estaría declarando cada vez que entra en el bucle
+    byte ballDirectionX = 1; //Si la dirección es a la derecha (suma) y si es a la izquierda (resta)
+    byte ballCurrentSpeedX = 6;//El incremento que irá tomando. Velocidad
     //sumar -1 es restar 1. (+-1) es igual que -1
-    int ballCenterY = 0;//Si declarara la variable dentro no serviría poque la estaría declarando cada vez que entra en el bucle
-    int ballDirectionY = 1; //Si la dirección es arriba (restando) y si es abajo (sumando)
-    int ballCurrentSpeedY = 6;//El incremento que irá tomando.Velocidad
+    short ballCenterY = 0;//Si declarara la variable dentro no serviría poque la estaría declarando cada vez que entra en el bucle
+    byte ballDirectionY = 1; //Si la dirección es arriba (restando) y si es abajo (sumando)
+    byte ballCurrentSpeedY = 6;//El incremento que irá tomando.Velocidad
     //sumar -1 es restar 1. (+-1) es igual que -1
     
-    
-    
+        
     @Override
     public void start(Stage stage) {
-        //StackPane (apila una cosa encima de otra en el panel. Así que no nos sirve, porque se pisan
-       // StackPane root = new StackPane();//creo un nuevo objeto de tipo StackPane llamado root
+        final short SCENE_HEIGHT = 480; //constante con el alto de la pantalla (scene)
+        final short SCENE_WIDTH = 640; //constante para el ancho de la pantalla (scene)
+        
+                //StackPane (apila una cosa encima de otra en el panel. Así que no nos sirve, porque se pisan
+        // StackPane root = new StackPane();//creo un nuevo objeto de tipo StackPane llamado root
         Pane root = new Pane();
-        var scene = new Scene(root, 640, 480);//le digo a la escena el panel principal (root) y el tamaño de la pantalla
+        var scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGHT);//le digo a la escena el panel principal (root) y el tamaño de la pantalla
         scene.setFill(Color.BLACK);//Le damos el color de fondo a la escena
         stage.setScene(scene);
         stage.show();
+                
         
         //new Circle() => Crear un objeto de la clase Circle
         Circle circleBall = new Circle(); //Creamos una variable llamada circleBall(nuevo objeto -> new) de tipo Círculo(clase Círculo)
@@ -50,6 +56,34 @@ public class App extends Application {
                
         root.getChildren().add(circleBall);//Hay que añadir la bola al StackPane(panel llamado root). Los objtos que contiene el panel son los Children. 
                       
+        
+        short rectHeight = 50;//variable con la altura del rectángulo
+        Rectangle rectStick = new Rectangle();//Creamos un nuevo objeto de clase Rectangle (en una variable)
+        rectStick.setWidth(10);//Le damos ancho
+        rectStick.setHeight(rectHeight);//Le damos alto
+        rectStick.setX(SCENE_WIDTH-40);//Le damos posición horizontal. Origen de coordenadas en la esquina superior izquierda del rectángulo. PARA QUE SALGA CENTRADO HAY QUE RESTARLE LA MITAD DEL ANCHO
+        rectStick.setY((SCENE_HEIGHT-rectHeight)/2);//Le damos posición vertical. HAY QUE RESTARLE LA MITAD DEL ALTO DEL RECTÁNGULO para que salga centrado.
+        //(480/2-100/2) es igual que ((480-100)/2). la segunda opción es mejor.
+        rectStick.setFill(Color.BLUE);//Le damos color
+        
+        root.getChildren().add(rectStick);//Para que aparezca en la pantalla (panel root)
+        
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>(){//Llama al método setOnKeyPressed. Cuando detecte que se pulsa una tecla en la escena (se puede hacer que en vez que en la escena se detecte cuando pulse dentro de un campo de texto)
+            public void handle(final KeyEvent keyEvent){
+                switch(keyEvent.getCode()){//Según la tecla pulsada
+                    case UP:
+                        System.out.println("Arriba");
+                        break;
+                     case DOWN:
+                        System.out.println("Abajo");
+                        break;
+                }
+                   
+            }
+        });
+        
+        
+        
         
         // Game loop usando Timeline
         Timeline timeline = new Timeline(//Sirve para lo que lo que metamos aquí. Podemos utilizar varios TimeLine con diferentes velocidades para diferentes cosas
@@ -79,7 +113,8 @@ public class App extends Application {
         timeline.setCycleCount(Timeline.INDEFINITE);//Llama al método setCycleCount (para que la animación siga indefinidamente
         timeline.play(); //Llama al método Play para echar a andar la animación
     }
-
+  
+    
     public static void main(String[] args) {
         launch();
     }
