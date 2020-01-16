@@ -19,7 +19,11 @@ import javafx.util.Duration;
  * JavaFX App
  */
 public class App extends Application {
-    //declaramos todas las variables generales aquí
+//declaramos todas las variables generales aquí
+    
+    final short SCENE_HEIGHT = 480; //constante con el alto de la pantalla (scene)
+    final short SCENE_WIDTH = 640; //constante para el ancho de la pantalla (scene)
+    
     short ballCenterX = 0;//Si declarara la variable dentro no serviría poque la estaría declarando cada vez que entra en el bucle
     byte ballDirectionX = 1; //Si la dirección es a la derecha (suma) y si es a la izquierda (resta)
     byte ballCurrentSpeedX = 6;//El incremento que irá tomando. Velocidad
@@ -29,13 +33,20 @@ public class App extends Application {
     byte ballCurrentSpeedY = 6;//El incremento que irá tomando.Velocidad
     //sumar -1 es restar 1. (+-1) es igual que -1
     
+    short stickHeight = 50;//variable con la altura del rectángulo
+    short stickPosY = (short)((SCENE_HEIGHT-stickHeight)/2);// si se pone el tipo de dato delante de un valor entre paréntesis lo convierte a ese tipo de datos. En este caso convertimos el resultado de toda la operación.
+    byte stickCurrentSpeed = 4; //Velocidad en la que se moverá la pala
+    byte stickDirection = 0; //Si multiplica por 1 iría hacia abajo y -1 hacia arriba. Empieza en 0 para que la pala aparezca primero parada
         
+    
+    
+    
+    
+    
     @Override
     public void start(Stage stage) {
-        final short SCENE_HEIGHT = 480; //constante con el alto de la pantalla (scene)
-        final short SCENE_WIDTH = 640; //constante para el ancho de la pantalla (scene)
-        
-                //StackPane (apila una cosa encima de otra en el panel. Así que no nos sirve, porque se pisan
+       
+        //StackPane (apila una cosa encima de otra en el panel. Así que no nos sirve, porque se pisan
         // StackPane root = new StackPane();//creo un nuevo objeto de tipo StackPane llamado root
         Pane root = new Pane();
         var scene = new Scene(root, SCENE_WIDTH, SCENE_HEIGHT);//le digo a la escena el panel principal (root) y el tamaño de la pantalla
@@ -57,12 +68,11 @@ public class App extends Application {
         root.getChildren().add(circleBall);//Hay que añadir la bola al StackPane(panel llamado root). Los objtos que contiene el panel son los Children. 
                       
         
-        short rectHeight = 50;//variable con la altura del rectángulo
         Rectangle rectStick = new Rectangle();//Creamos un nuevo objeto de clase Rectangle (en una variable)
         rectStick.setWidth(10);//Le damos ancho
-        rectStick.setHeight(rectHeight);//Le damos alto
+        rectStick.setHeight(stickHeight);//Le damos alto
         rectStick.setX(SCENE_WIDTH-40);//Le damos posición horizontal. Origen de coordenadas en la esquina superior izquierda del rectángulo. PARA QUE SALGA CENTRADO HAY QUE RESTARLE LA MITAD DEL ANCHO
-        rectStick.setY((SCENE_HEIGHT-rectHeight)/2);//Le damos posición vertical. HAY QUE RESTARLE LA MITAD DEL ALTO DEL RECTÁNGULO para que salga centrado.
+        rectStick.setY(stickPosY);//Le damos posición vertical. HAY QUE RESTARLE LA MITAD DEL ALTO DEL RECTÁNGULO para que salga centrado.
         //(480/2-100/2) es igual que ((480-100)/2). la segunda opción es mejor.
         rectStick.setFill(Color.BLUE);//Le damos color
         
@@ -72,18 +82,16 @@ public class App extends Application {
             public void handle(final KeyEvent keyEvent){
                 switch(keyEvent.getCode()){//Según la tecla pulsada
                     case UP:
-                        System.out.println("Arriba");
+                        stickDirection = -1;
                         break;
                      case DOWN:
-                        System.out.println("Abajo");
+                        stickDirection = 1;
                         break;
                 }
                    
             }
         });
-        
-        
-        
+                
         
         // Game loop usando Timeline
         Timeline timeline = new Timeline(//Sirve para lo que lo que metamos aquí. Podemos utilizar varios TimeLine con diferentes velocidades para diferentes cosas
@@ -107,14 +115,25 @@ public class App extends Application {
                     } else if (ballCenterY<=0){//Cuando llegue al principio de la pantalla tendrá que ir otra vez hacia la derecha sumando
                         ballDirectionY = 1; //vuelve a cambiar la dirección a la derecha
                     } 
+                    // Si quisiéramos que la pala se vaya moviendo cada vez que se pulse la tecla lo pondríamos en el switch de la tecla para la pala.
+                    //Como queremos que se siga moviendo con sólo pulsar una tecla se hace en la animación (timeline).
+                    rectStick.setY(stickPosY);
+                    stickPosY += stickCurrentSpeed * stickDirection; // sumo (la velocidad * (stickDirection 1 o -1)). Cuando stickDirection es 0 la pala no se mueve.
+                    if (stickPosY <=0){//Si la pala sale por arriba o se sale por abajo la paro y la pongo en la posición correcta
+                        stickDirection = 0;
+                        stickPosY = 0;
+                    }else if(stickPosY >= SCENE_HEIGHT-stickHeight){
+                        stickDirection = 0;
+                        stickPosY = (short)(SCENE_HEIGHT-stickHeight);// si da problemas de compatibilidad de variables le ponermos short delante                        
+                    }
                 }
             })                
         );
         timeline.setCycleCount(Timeline.INDEFINITE);//Llama al método setCycleCount (para que la animación siga indefinidamente
         timeline.play(); //Llama al método Play para echar a andar la animación
     }
-  
     
+        
     public static void main(String[] args) {
         launch();
     }
