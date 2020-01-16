@@ -6,12 +6,12 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -126,6 +126,13 @@ public class App extends Application {
                         stickDirection = 0;
                         stickPosY = (short)(SCENE_HEIGHT-stickHeight);// si da problemas de compatibilidad de variables le ponermos short delante                        
                     }
+                    //Método intersect de la clase Shape. Como es STATIC no hace falta crear un objeto para guardar lo que devuelve, se puede usar directamente la clase (Shape).
+                    Shape shapeCollision = Shape.intersect(circleBall,rectStick);//Creamos una variable de la clase Shape para guardar la intersección
+                    boolean colisionVacia = shapeCollision.getBoundsInLocal().isEmpty(); //Si is Empty devuelve Falso es que tiene una forma y ha chocado (porque la intersección tine la forma que se sobrepone). Guardo el boolean que nos devuelve (verdadero o falso en una variable)
+                    if (colisionVacia == false){// Si es falso (ha chocado) devolvemos un mensaje en pantalla
+                        System.out.println("Ha colisionado");
+                        ballDirectionX = -1;
+                    }    
                 }
             })                
         );
